@@ -49,8 +49,7 @@ function queryGiphy(danceName) {
   let limit = 4;
   let rating = "g";
   let apiKey = "2fLgdLgXeV1kUnyRwYKej42K3Dtjue87";
-  // let queryURL = "https://api.giphy.com/v1/gifs/search";
-  let queryURL = "http://api.giphy.com/v1/gifs/search";
+  let queryURL = "https://api.giphy.com/v1/gifs/search";
   queryURL += '?' + $.param({
     'api_key': apiKey,
     'q': danceName,
