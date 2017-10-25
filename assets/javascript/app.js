@@ -1,120 +1,119 @@
-// giphy javascript
+//-------------------------//
+// giphy search javascript
+//-------------------------//
 
-
+//-------------------------//
 // global variables
-var topics = ["cow", "sheep", "moose", "bear"];
+//-------------------------//
+var dances = ["disco", "hip hop", "macarena", "polka", "flash mob"];
 var result = [];
 
-
+//-------------------------//
 // functions
+//-------------------------//
 
-//this function adds the buttons to the dom
+//-------------------------------------------------------------//
+// add the buttons to the dom
+ // dynamicaly generate a button for each dance in the array
+//-------------------------------------------------------------//
 function renderButtons() {
-  console.log("im in renderButtons");
-  console.log("topics.length" + topics.length);
-  $("#animal-view").empty();
-
-  for (let i = 0; i < topics.length; i++) {
-    console.log("im in the for loop");
-    // Then dynamicaly generating buttons for each movie in the array.
-    // This code $("<button>") is all jQuery needs to create the start and end tag. (<button></button>)
+  $("#dance-view").empty();
+  for (let i = 0; i < dances.length; i++) {
     let newButton = $("<button>");
-    // let animal = topics[i];
-    // Adding a class
-    newButton.addClass("animal");
-    // Adding a data-attribute with a value of the movie at index i
-    newButton.attr("data-name", topics[i]);
-    // Providing the button's text with a value of the movie at index i
-    newButton.attr("value", topics[i]);
-    newButton.text(topics[i]);
+    newButton.addClass("dance");
+    newButton.attr("data-name", dances[i]);
+    newButton.attr("value", dances[i]);
+    newButton.text(dances[i]);
     // Adding the button to the HTML
-    $("#animal-view").append(newButton);
-    $("#animal-input").val("");
+    $("#dance-view").append(newButton);
+    $("#dance-input").val("");
   }
 }
 
-// This function handles events where one button is clicked
-$("#add-animal").on("click", function (event) {
+
+//---------------------------------------------------------------//
+// handle submit button click events 
+// add the dance from the text field to the dances array
+//---------------------------------------------------------------//
+function addNewButton(dance) {
   // event.preventDefault() prevents the form from trying to submit itself.
-  // We're using a form so that the user can hit enter instead of clicking the button if they want
   event.preventDefault();
-
-  // This line will grab the text from the input box
-  var animal = $("#animal-input").val().trim();
-  // The movie from the textbox is then added to our array
-  topics.push(animal);
-
-  // calling renderButtons which handles the processing of our movie array
+  dances.push(dance);
   renderButtons();
-});
+}
 
-
-
-function queryGiphy(animalName) {
-  console.log("i clicked an animal-view button");
-  console.log("this " + this);
-  // var animalQuery = $(".animal").data("name");
-  // var animalQuery = "";
-  // animalQuery = topics[$(this).attr("data-index")];
-  var limit = 5;
-
-  console.log("animalQuery " + animalName);
-  var apiKey = "2fLgdLgXeV1kUnyRwYKej42K3Dtjue87";
-  // var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=cats";
-
-  var queryURL = "https://api.giphy.com/v1/gifs/search";
+//---------------------------------------------------------------//
+// query the giphy api to bring back dance images
+//---------------------------------------------------------------//
+function queryGiphy(danceName) {
+  let limit = 4;
+  let rating = "g";
+  let apiKey = "2fLgdLgXeV1kUnyRwYKej42K3Dtjue87";
+  let queryURL = "https://api.giphy.com/v1/gifs/search";
   queryURL += '?' + $.param({
     'api_key': apiKey,
-    'q': animalName,
-    // 'tag': animal,
-    'limit': limit
+    'q': danceName,
+    'limit': limit,
+    'rating': rating
   });
-
-  console.log(queryURL);
-
   $.ajax({
     url: queryURL,
     method: 'GET'
   }).done(function (response) {
     result = response.data;
-    console.log(result[0]);
-    console.log(result.length);
+    let rowDiv = $("<div>");
+    rowDiv.addClass("row");
+    rowDiv.attr("id", "gifReturnRow");
+    $("#gifReturnDiv").append(rowDiv);
 
-  console.log(result[0]);
-  console.log("RESULT.LENGTH " + result.length);
-
-  for (var i = 0; i < result.length; i++) {
-    var gifURL = result[i].images.fixed_height.url;
-    var rating1 = result[i].rating;
-    console.log("GIFURL " + gifURL);
-    console.log("RATING " + rating1);
-    var gifDiv = $("<div>");
-    var img1 = $("<img id=gifUrl>");
-    img1.attr("src", gifURL);
-    var p1 = $("<p>");
-    p1.text("Rating: " + rating1);
-    gifDiv.append(img1);
-    gifDiv.append(p1);
-
-    console.log(gifDiv);
-
-    $("#gifReturnDiv").prepend(gifDiv);
-
-
-  }
-});
+    for (let i = 0; i < result.length; i++) {
+      let gifUrl = result[i].images.fixed_height.url;
+      let rating1 = result[i].rating;
+      let gifDiv = $("<div>");
+      gifDiv.addClass("col-md-3");
+      let img1 = $("<img class=giphyGif>");
+      img1.attr("src", gifUrl);
+      let p1 = $("<p>");
+      p1.text("Rating: " + rating1);
+      gifDiv.append(img1);
+      gifDiv.append(p1);
+      $("#gifReturnRow").prepend(gifDiv);
+    }
+  });
 }
-// main proecss
+
+
+
+//----------------//
+// main process
+//----------------//
 $(document).ready(function () {
 
   renderButtons();
 
-
-  $(".animal").on("click", function () {
-    var animalQuery = $(this).attr("data-name");
-    console.log("i clicked the .animal button");
-    queryGiphy(animalQuery);
+  //------------------------------------------------//
+  // when a dance button is clicked, execute the
+  // queryGiphy function to call the giphy api
+  //------------------------------------------------//
+  $('#dance-view').on('click', '.dance', function () {
+    var danceQuery = $(this).attr("data-name");
+    queryGiphy(danceQuery);
   });
+
+  //------------------------------------------------------//
+  // Add dance buttons when the submit button is clicked
+  //------------------------------------------------------//
+  $("#add-dance").on("click", function (event) {
+    // event.preventDefault() prevents the form from trying to submit itself.
+    event.preventDefault();
+    var danceName = $("#dance-input").val().trim();
+    if (danceName !== "") {
+      addNewButton(danceName);
+    }
+  });
+
+
+
 
 
 });
