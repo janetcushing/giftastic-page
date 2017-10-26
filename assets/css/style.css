@@ -7,8 +7,15 @@ body{
     height: 100%;
     background-color: rgb(255, 246, 192);
 }
+
+#animateMsg{
+    font-weight: bold;
+    font-size: 18px;
+    color: blue;
+}
+
 .giphyGif{
-    border: 5px solid #7f8081;
+    border: 4px solid #7f8081;
 }
 
 p{
@@ -17,7 +24,6 @@ p{
 }
 
 .content{
-    
     margin-bottom: -50px;
     min-height: calc(100vh - 70px);
 }
